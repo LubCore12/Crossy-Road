@@ -9,12 +9,9 @@ class Player(Sprite):
 
         self.position = pos
         self.direction = pygame.Vector2()
-        self.jump_length = 100
 
-        self.jump_timer = Timer(500, func=self.enable_jump, repeat=True, autorun=True)
-        self.can_jump = False
-
-    def enable_jump(self):
+        self.jump_length = self.rect.width
+        self.have_to_jump = 0
         self.can_jump = True
 
     def input(self):
@@ -25,18 +22,21 @@ class Player(Sprite):
             self.direction.y = int(keys[pygame.K_DOWN] - keys[pygame.K_UP])
 
         if self.direction:
+            self.have_to_jump = self.jump_length
             self.can_jump = False
 
     def move(self, delta_time):
         if self.can_jump:
             self.input()
 
-        self.rect.x += self.direction.x * self.jump_length
-        self.rect.y += self.direction.y * self.jump_length
+        if self.have_to_jump > 0:
+            self.rect.center += self.direction * delta_time * JUMP_SPEED
+            self.have_to_jump -= abs(self.direction.x if self.direction.x else self.direction.y) * delta_time * JUMP_SPEED
 
-        if not self.can_jump:
+        if self.have_to_jump <= 0:
             self.direction = pygame.Vector2()
+            self.have_to_jump = 0
+            self.can_jump = True
 
     def update(self, delta_time):
-        self.jump_timer.update()
         self.move(delta_time)

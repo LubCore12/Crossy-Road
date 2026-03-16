@@ -5,7 +5,7 @@ class Car(AminationSprite):
     def __init__(self, surf, pos, groups):
         super().__init__(surf, pos, groups)
 
-        self.speed = 300
+        self.speed = 500
 
     def move(self, delta_time):
         self.rect.x += delta_time * self.speed
