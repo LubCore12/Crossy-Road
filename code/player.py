@@ -7,10 +7,13 @@ class Player(Sprite):
     def __init__(self, surf, pos, groups):
         super().__init__(surf, pos, groups)
 
+        self.correct_rect = self.rect
+        self.rect = self.rect.inflate(0, -20)
+
         self.position = pos
         self.direction = pygame.Vector2()
 
-        self.jump_length = self.rect.width
+        self.jump_length = self.correct_rect.width
         self.have_to_jump = 0
         self.can_jump = True
 
@@ -34,6 +37,7 @@ class Player(Sprite):
             self.have_to_jump -= abs(self.direction.x if self.direction.x else self.direction.y) * delta_time * JUMP_SPEED
 
         if self.have_to_jump <= 0:
+            self.rect.center += self.direction * self.have_to_jump
             self.direction = pygame.Vector2()
             self.have_to_jump = 0
             self.can_jump = True
