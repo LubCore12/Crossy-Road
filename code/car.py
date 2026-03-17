@@ -13,5 +13,4 @@ class Car(AminationSprite):
         self.rect.x += delta_time * self.speed
 
     def update(self, delta_time):
-        self.car_collisions()
         self.move(delta_time)
