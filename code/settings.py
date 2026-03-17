@@ -8,6 +8,7 @@ WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 TILE_SIZE = 64
 JUMP_SPEED = 300
+LEVEL_HEIGHT = 200 * TILE_SIZE
 
 from timer import *
 from support import *

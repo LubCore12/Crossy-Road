@@ -3,7 +3,7 @@ import pygame
 from settings import *
 
 
-class Player(Sprite):
+class Player(AnimationSprite):
     def __init__(self, surf, pos, groups):
         super().__init__(surf, pos, groups)
 
@@ -13,7 +13,7 @@ class Player(Sprite):
         self.position = pos
         self.direction = pygame.Vector2()
 
-        self.jump_length = self.correct_rect.width
+        self.jump_length = TILE_SIZE
         self.have_to_jump = 0
         self.can_jump = True
 
@@ -42,5 +42,15 @@ class Player(Sprite):
             self.have_to_jump = 0
             self.can_jump = True
 
+    def wall_collisions(self):
+        if self.rect.centerx <= 0:
+            self.rect.centerx = 0
+        if self.rect.centerx >= WINDOW_WIDTH - self.rect.width:
+            self.rect.centerx = WINDOW_WIDTH - self.rect.width
+        if self.rect.centery > LEVEL_HEIGHT - 100:
+            self.rect.center = self.correct_rect.center
+            self.have_to_jump = 0
+
     def update(self, delta_time):
         self.move(delta_time)
+        self.wall_collisions()

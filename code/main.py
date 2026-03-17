@@ -22,11 +22,12 @@ class Game:
 
         self.setup()
 
-    def create_cars(self, x, y, speed=500, flip=False):
+    def create_cars(self, x, y, speed=450, flip=False):
         Car(choice(self.car_images), (x, y), (self.all_sprites, self.car_sprites), speed, flip)
 
     def load_assets(self):
         self.car_images = import_animation_folders('images', 'cars')
+        self.player_images = import_folder('images', 'chicken')
 
     def setup(self):
         for x, y, image in self.map.get_layer_by_name('Ground').tiles():
@@ -35,18 +36,23 @@ class Game:
         for entity in self.map.get_layer_by_name('Objects'):
             if entity.name == "Player":
                 self.spawn_point = entity.x, entity.y
-                self.player = Player(pygame.image.load(join('images', 'chicken', '1.png')), self.spawn_point, self.all_sprites)
+                self.player = Player(self.player_images, self.spawn_point, self.all_sprites)
 
             if entity.name == "Car":
-                print(entity.x, entity.y)
-                self.car_positions.append((randrange(int(entity.x), -200), entity.y))
+                self.car_positions.append((randrange(int(entity.x), int(entity.x) + 400), entity.y))
             if entity.name == "Car reverse":
-                self.car_positions.append((entity.x, entity.y, -500, True))
+                self.car_positions.append((randrange(int(entity.x), int(entity.x) + 400), entity.y, -450, True))
 
     def collisions(self):
          if pygame.sprite.spritecollide(self.player, self.car_sprites, dokill=False):
              self.player.rect.center = self.spawn_point
              self.player.have_to_jump = 0
+
+         for sprite_1 in self.car_sprites:
+             for sprite_2 in self.car_sprites:
+                 if sprite_1.rect.colliderect(sprite_2) and sprite_1 != sprite_2 and sprite_1.flip == sprite_2.flip:
+                     sprite_1.kill()
+                     sprite_2.kill()
 
     def run_game(self):
         while self.running:

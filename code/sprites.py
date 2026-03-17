@@ -9,7 +9,7 @@ class Sprite(pygame.sprite.Sprite):
         self.rect = self.image.get_frect(center=pos)
 
 
-class AminationSprite(Sprite):
+class AnimationSprite(Sprite):
     def __init__(self, frames, pos, groups):
         self.frames = frames
         self.frame_index = 0
@@ -17,5 +17,5 @@ class AminationSprite(Sprite):
         super().__init__(self.frames[self.frame_index], pos, groups)
 
     def update(self, delta_time):
-        self.frame_index += 1 * delta_time
+        self.frame_index += 5 * delta_time
         self.image = self.frames[self.frame_index] % len(self.frames)

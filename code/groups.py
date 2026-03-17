@@ -11,7 +11,7 @@ class AllSprites(pygame.sprite.Group):
     def draw(self, target):
         target_x, target_y = target
 
-        self.offset.y = -(target_y - WINDOW_HEIGHT / 2)
+        self.offset.y = -(target_y - WINDOW_HEIGHT / 2) if target_y < 200 * TILE_SIZE - 400 else -(LEVEL_HEIGHT - 400 - WINDOW_HEIGHT / 2)
 
-        for sprite in self:
+        for sprite in sorted(self, key=lambda sprite: (isinstance(sprite, AnimationSprite), sprite.rect.y)):
             self.display_surface.blit(sprite.image, sprite.rect.center + self.offset)
