@@ -4,11 +4,10 @@ from settings import *
 
 
 class Player(AnimationSprite):
-    def __init__(self, surf, pos, groups):
+    def __init__(self, surf, pos, groups, tree_group):
         super().__init__(surf, pos, groups)
 
-        self.correct_rect = self.rect
-        self.rect = self.rect.inflate(0, -20)
+        self.rect = self.rect
 
         self.position = pos
         self.direction = pygame.Vector2()
@@ -16,6 +15,12 @@ class Player(AnimationSprite):
         self.jump_length = TILE_SIZE
         self.have_to_jump = 0
         self.can_jump = True
+
+        self.tree_group = tree_group
+
+    @property
+    def on_tree(self):
+        return pygame.sprite.spritecollide(self, self.tree_group, dokill=False)
 
     def input(self):
         keys = pygame.key.get_just_pressed()
@@ -43,13 +48,10 @@ class Player(AnimationSprite):
             self.can_jump = True
 
     def wall_collisions(self):
-        if self.rect.centerx <= 0:
-            self.rect.centerx = 0
-        if self.rect.centerx >= WINDOW_WIDTH - self.rect.width:
-            self.rect.centerx = WINDOW_WIDTH - self.rect.width
-        if self.rect.centery > LEVEL_HEIGHT - 100:
-            self.rect.center = self.correct_rect.center
-            self.have_to_jump = 0
+        if self.rect.left <= 0:
+            self.rect.left = 0
+        if self.rect.right >= WINDOW_WIDTH:
+            self.rect.right = WINDOW_WIDTH
 
     def update(self, delta_time):
         self.move(delta_time)
