@@ -1,13 +1,10 @@
-import pygame
-
 from settings import *
+from sprites import AnimationSprite
 
 
 class Player(AnimationSprite):
     def __init__(self, surf, pos, groups, tree_group):
         super().__init__(surf, pos, groups)
-
-        self.rect = self.rect
 
         self.position = pos
         self.direction = pygame.Vector2()
@@ -52,6 +49,12 @@ class Player(AnimationSprite):
             self.rect.left = 0
         if self.rect.right >= WINDOW_WIDTH:
             self.rect.right = WINDOW_WIDTH
+
+    def reset_player(self, pos):
+        self.rect.topleft = pos
+        self.direction = pygame.Vector2()
+        self.have_to_jump = 0
+        self.can_jump = True
 
     def update(self, delta_time):
         self.move(delta_time)

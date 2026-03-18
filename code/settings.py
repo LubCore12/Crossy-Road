@@ -10,9 +10,3 @@ TILE_SIZE = 64
 JUMP_SPEED = 300
 LEVEL_HEIGHT = 200 * TILE_SIZE
 ANIMATION_SPEED = 5
-
-from timer import *
-from support import *
-from sprites import *
-from player import *
-from groups import *

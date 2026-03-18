@@ -1,6 +1,10 @@
-import pygame
-
 from settings import *
+
+from timer import Timer
+from support import import_folder, import_image, import_subfolders
+from sprites import Sprite, DeathSprite, Car, Tree
+from player import Player
+from groups import AllSprites
 
 
 class Game:
@@ -25,18 +29,19 @@ class Game:
         self.tree_timer = Timer(5000, autorun=True)
         self.tree_positions = []
 
+        self.tree_surf = import_image('graphics', 'tree')
+
         self.setup()
 
     def create_cars(self, x, y, speed=450, flip=False):
         Car(choice(self.car_images), (x, y), (self.all_sprites, self.car_sprites), speed, flip)
 
     def create_trees(self, pos, speed):
-        n = pygame.image.load(join('images', 'tree.png')).convert_alpha()
-        Tree(n, pos, (self.all_sprites, self.tree_sprites), -speed, self.player)
+        Tree([self.tree_surf], pos, (self.all_sprites, self.tree_sprites), -speed, self.player)
 
     def load_assets(self):
-        self.car_images = import_animation_folders('images', 'cars')
-        self.player_images = import_folder('images', 'chicken')
+        self.car_images = import_subfolders('graphics', 'cars')
+        self.player_images = import_folder('graphics', 'chicken')
 
     def setup(self):
         for entity in self.map.get_layer_by_name('Objects'):
@@ -57,15 +62,14 @@ class Game:
 
     def collisions(self):
         if pygame.sprite.spritecollide(self.player, self.car_sprites, dokill=False):
-            self.player.rect.topleft = self.spawn_point
-            self.player.have_to_jump = 0
+            self.player.reset_player(self.spawn_point)
 
-
-        for sprite_1 in self.car_sprites:
-            for sprite_2 in self.car_sprites:
-                if sprite_1.rect.colliderect(sprite_2) and sprite_1 != sprite_2 and sprite_1.flip == sprite_2.flip:
-                    sprite_1.kill()
-                    sprite_2.kill()
+        cars = list(self.car_sprites)
+        for index, first_sprite in enumerate(cars):
+            for second_sprite in cars[index + 1:]:
+                if first_sprite.flip == second_sprite.flip and first_sprite.rect.colliderect(second_sprite.rect):
+                    first_sprite.kill()
+                    second_sprite.kill()
 
     def run_game(self):
         while self.running:
@@ -89,8 +93,8 @@ class Game:
                 self.tree_timer.activate()
 
             self.all_sprites.update(delta_time)
+            self.display_surface.fill((0, 0, 0))
             self.all_sprites.draw(self.player.rect.center)
-
             self.collisions()
 
             pygame.display.update()

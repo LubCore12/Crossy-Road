@@ -1,5 +1,3 @@
-from pygame import FRect
-
 from settings import *
 
 
@@ -19,11 +17,14 @@ class AnimationSprite(Sprite):
         super().__init__(self.frames[self.frame_index], pos, groups)
 
     def update(self, delta_time):
-        self.frame_index += ANIMATION_SPEED * delta_time
-        self.image = self.frames[self.frame_index] % len(self.frames)
+        self.frame_index = (self.frame_index + ANIMATION_SPEED * delta_time) % len(self.frames)
+        self.image = self.frames[int(self.frame_index)]
 
 
-class MoveableSprite():
+class MoveableSprite(AnimationSprite):
+    def __init__(self, frames, pos, groups):
+        super().__init__(frames, pos, groups)
+
     def move(self, delta_time):
         self.rect.x += delta_time * self.speed
 
@@ -31,8 +32,13 @@ class MoveableSprite():
         if -1000 > self.rect.x or WINDOW_WIDTH + 1000 < self.rect.x:
             self.kill()
 
+    def update(self, delta_time):
+        super().update(delta_time)
+        self.destroy()
+        self.move(delta_time)
 
-class Car(AnimationSprite, MoveableSprite):
+
+class Car(MoveableSprite):
     def __init__(self, surf, pos, groups, speed, flip):
         super().__init__(surf, pos, groups)
 
@@ -42,19 +48,12 @@ class Car(AnimationSprite, MoveableSprite):
         self.speed = speed
         self.frames = [pygame.transform.flip(frame, flip, False) for frame in self.frames]
 
-    def update(self, delta_time):
-        self.destroy()
-        self.move(delta_time)
 
+class Tree(MoveableSprite):
+    def __init__(self, frames, pos, groups, speed, target):
+        super().__init__(frames, pos, groups)
 
-class Tree(pygame.sprite.Sprite, MoveableSprite):
-    def __init__(self, surf, pos, groups, speed, target):
-        super().__init__(groups)
-
-        self.image = surf
-        self.rect = self.image.get_frect(topleft=pos)
         self.speed = speed
-
         self.target = target
 
     def target_move(self, delta_time):
@@ -62,9 +61,7 @@ class Tree(pygame.sprite.Sprite, MoveableSprite):
             self.target.rect.x += delta_time * self.speed
 
     def update(self, delta_time):
-        self.rect.center = self.rect.center
-        self.destroy()
-        self.move(delta_time)
+        super().update(delta_time)
         self.target_move(delta_time)
 
 
@@ -77,8 +74,8 @@ class DeathSprite(Sprite):
 
     def respawn(self):
         if not self.target.on_tree:
-            if self.rect.colliderect(self.target):
-                self.target.rect.topleft = self.start_pos
+            if self.rect.colliderect(self.target.rect):
+                self.target.reset_player(self.start_pos)
 
     def update(self, delta_time):
         self.respawn()
